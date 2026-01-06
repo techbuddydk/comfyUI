@@ -61,9 +61,9 @@ install_requirements() {
 
   msg "Installing ComfyUI requirements"
   cd "$COMFY_DIR"
-  pip install -r requirements.txt --no-hashes
-
+  PIP_REQUIRE_HASHES=0 pip install -r requirements.txt --upgrade
 }
+
 
 export_temp() {
   export TMPDIR="$TMP_DIR"
