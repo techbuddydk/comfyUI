@@ -14,12 +14,16 @@ LOG_FILE="${LOG_FILE:-$LOG_DIR/comfyui.log}"
 TMP_DIR="${TMP_DIR:-$BASE_DIR/tmp}"
 
 # Auto-detect Python 3.10 or 3.11 (required for ComfyUI/PyTorch stability)
-if command -v python3.10 >/dev/null 2>&1; then
-  PYTHON_BIN="${PYTHON_BIN:-python3.10}"
-elif command -v python3.11 >/dev/null 2>&1; then
-  PYTHON_BIN="${PYTHON_BIN:-python3.11}"
-else
-  PYTHON_BIN="${PYTHON_BIN:-python3}"
+if [ -z "${PYTHON_BIN:-}" ]; then
+  if command -v python3.10 >/dev/null 2>&1; then
+    PYTHON_BIN="python3.10"
+  elif command -v python3.11 >/dev/null 2>&1; then
+    PYTHON_BIN="python3.11"
+  elif command -v python3 >/dev/null 2>&1; then
+    PYTHON_BIN="python3"
+  else
+    PYTHON_BIN="python"
+  fi
 fi
 
 # =========================
