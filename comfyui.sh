@@ -77,9 +77,15 @@ install_requirements() {
   msg "Installing PyTorch with CUDA support (cu121)"
   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 
+  msg "Installing critical dependencies first"
+  pip install typing_extensions filelock fsspec jinja2 networkx sympy packaging
+
   msg "Installing ComfyUI requirements"
   cd "$COMFY_DIR"
   pip install --no-cache-dir -r requirements.txt
+
+  msg "Installing any missing dependencies"
+  pip install typing_extensions filelock fsspec jinja2 networkx sympy packaging --upgrade
 }
 
 
