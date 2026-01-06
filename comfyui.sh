@@ -61,7 +61,7 @@ install_requirements() {
 
   msg "Installing ComfyUI requirements"
   cd "$COMFY_DIR"
-  PIP_REQUIRE_HASHES=0 pip install -r requirements.txt --upgrade
+  pip install --no-cache-dir --no-deps -r requirements.txt --upgrade || pip install --no-cache-dir -r requirements.txt --upgrade
 }
 
 
