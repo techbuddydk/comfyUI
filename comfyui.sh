@@ -79,7 +79,7 @@ install_requirements() {
   pip install --upgrade pip wheel setuptools
 
   msg "Installing PyTorch with CUDA support (cu121)"
-  pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+  pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 
   msg "Installing critical dependencies first"
   pip install typing_extensions filelock fsspec jinja2 networkx sympy packaging
