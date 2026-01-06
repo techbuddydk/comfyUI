@@ -12,7 +12,15 @@ HOST="${HOST:-0.0.0.0}"
 LOG_DIR="${LOG_DIR:-$BASE_DIR/logs}"
 LOG_FILE="${LOG_FILE:-$LOG_DIR/comfyui.log}"
 TMP_DIR="${TMP_DIR:-$BASE_DIR/tmp}"
-PYTHON_BIN="${PYTHON_BIN:-python3}"
+
+# Auto-detect Python 3.10 or 3.11 (required for ComfyUI/PyTorch stability)
+if command -v python3.10 >/dev/null 2>&1; then
+  PYTHON_BIN="${PYTHON_BIN:-python3.10}"
+elif command -v python3.11 >/dev/null 2>&1; then
+  PYTHON_BIN="${PYTHON_BIN:-python3.11}"
+else
+  PYTHON_BIN="${PYTHON_BIN:-python3}"
+fi
 
 # =========================
 # Helpers
@@ -40,7 +48,7 @@ ensure_git_clone() {
 
 ensure_venv() {
   if [ ! -d "$VENV_DIR" ]; then
-    msg "Creating venv: $VENV_DIR"
+    msg "Creating venv with $PYTHON_BIN: $VENV_DIR"
     cd "$COMFY_DIR"
     "$PYTHON_BIN" -m venv "$VENV_DIR"
   else
@@ -51,6 +59,13 @@ ensure_venv() {
 activate_venv() {
   # shellcheck disable=SC1090
   source "$VENV_DIR/bin/activate"
+  local pyver
+  pyver=$(python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+  msg "Python version: $pyver"
+  if [[ "$pyver" == "3.12"* ]] || [[ "$pyver" > "3.11" ]]; then
+    msg "⚠️  WARNING: Python $pyver detected. ComfyUI works best with Python 3.10 or 3.11"
+    msg "Consider recreating venv: rm -rf $VENV_DIR && python3.10 -m venv $VENV_DIR"
+  fi
   python -V
   pip -V
 }
@@ -59,9 +74,12 @@ install_requirements() {
   msg "Upgrading pip/wheel/setuptools"
   pip install --upgrade pip wheel setuptools
 
+  msg "Installing PyTorch with CUDA support (cu121)"
+  pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
   msg "Installing ComfyUI requirements"
   cd "$COMFY_DIR"
-  pip install --no-cache-dir --no-deps -r requirements.txt --upgrade || pip install --no-cache-dir -r requirements.txt --upgrade
+  pip install --no-cache-dir -r requirements.txt
 }
 
 
